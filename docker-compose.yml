@@ -1,0 +1,32 @@
+services:
+  nginx:
+    container_name: nestjs-backend-lion
+    image: nestjs-backend
+    build:
+      context: .
+      dockerfile: nestjs.prod.dockerfile
+    volumes:
+      - /home/inaciopjsi/.ssl/privkey.pem:/root/ssl/key.pem
+      - /home/inaciopjsi/.ssl/cert.pem:/root/ssl/cert.pem
+      - /home/inaciopjsi/.ssh/lionapi:/root/ssh/priv
+      - /home/inaciopjsi/.ssh/lionapi.pub:/root/ssh/public
+    environment:
+      - APP_DEBUG=false
+      - APP_INFO=false
+      - APP_WARN=false
+      - APP_ERROR=false
+      - APP_VERBOSE=false
+      - SERVER_XCSFR_COOKIE_NAME="MY_SITE.COM"
+      - APP_FRONTEND_SERVER='https://localhost:5001'
+      - CREDENTIALS_PRIVATE_CERT_PATH=/root/ssh/priv
+      - CREDENTIALS_PUBLIC_CERT_PATH=/root/ssh/public
+      - CREDENTIALS_HTTPS_CERT_KEY_PATH=/root/ssl/key.pem
+      - CREDENTIALS_HTTPS_CERT_PATH=/root/ssl/cert.pem
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
