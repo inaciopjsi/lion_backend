@@ -1,12 +1,12 @@
 import { Global, Module } from '@nestjs/common';
 
-import { UsersDatabaseModule } from './users/users.database.module';
+import { UsersDatabaseModule } from 'src/connections/users/users.database.module';
 
-import { UsersProviders } from './users/users/users.providers';
-import { MenusProviders } from './users/menus/menus.providers';
-import { NewslettersProviders } from './users/newsletters/newsletters.providers';
-import { PermissionsProviders } from './users/permissions/permissions.providers';
-import { RolesProviders } from './users/roles/roles.providers';
+import { UsersProviders } from 'src/connections/users/users/users.providers';
+import { MenusProviders } from 'src/connections/users/menus/menus.providers';
+import { NewslettersProviders } from 'src/connections/users/newsletters/newsletters.providers';
+import { PermissionsProviders } from 'src/connections/users/permissions/permissions.providers';
+import { RolesProviders } from 'src/connections/users/roles/roles.providers';
 
 @Global()
 @Module({

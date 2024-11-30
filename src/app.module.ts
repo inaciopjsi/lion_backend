@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 
 import { AppService } from './app.service';
@@ -15,8 +16,12 @@ import { SecurityController } from './controllers/security/security.controller';
 
 import { constantsConfig } from './configs/constantes.config';
 
+import { CoreConnectionsModule } from './connections/core.connections.module';
+import { FootballConnectionsModule } from './connections/football.connections.module';
+import { MpConnectionsModule } from './connections/mp.connections.module';
+import { OddsConnectionsModule } from './connections/odds.connections.module';
+import { SalesConnectionsModule } from './connections/sales.connections.module';
 import { UsersConnectionsModule } from './connections/users.connections.module';
-import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -37,6 +42,11 @@ import { ConfigModule } from '@nestjs/config';
         limit: constantsConfig.NUMBER_RATE_LIMIT,
       },
     ]),
+    CoreConnectionsModule,
+    FootballConnectionsModule,
+    MpConnectionsModule,
+    OddsConnectionsModule,
+    SalesConnectionsModule,
     UsersConnectionsModule,
   ],
   controllers: [CsrfTokenController, SecurityController],
