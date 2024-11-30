@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import { HelmetOptions } from 'helmet';
 import { IncomingMessage, ServerResponse } from 'http';
 
@@ -13,10 +14,14 @@ import { IncomingMessage, ServerResponse } from 'http';
 export class HelmetConfig {
   /**
    * Instancia ConfigService para os valores enviroment.
+   * @param {*} constantsConfig
    * @param {ConfigService} configService
    * @memberof HelmetConfig
    */
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    @Inject('CONTANTS_CONFIG') private constantsConfig,
+    private readonly configService: ConfigService,
+  ) {}
 
   /**
    *

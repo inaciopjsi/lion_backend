@@ -1,21 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { SessionOptions } from 'http2';
+
 @Injectable()
 export class ConfigProviders {
   constructor(private readonly configService: ConfigService) {}
 
-  /*public get rateLimitOptions() {
-    return rateLimit({
-      windowMs: 60 * 1000,
-      max: 60,
-      standardHeaders: true,
-      legacyHeaders: false,
-    });
-  }
-
   public sessionOptions(): SessionOptions {
-    return {
+    return <SessionOptions>{};
+    /*return {
       name: 'SessionCookie',
       genid: () => v4(),
       secret: constantsConfig.SECRET_SESSION,
@@ -29,4 +23,5 @@ export class ConfigProviders {
       },
     } as SessionOptions;
   }*/
+  }
 }

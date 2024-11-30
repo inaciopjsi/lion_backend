@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { doubleCsrf } from 'csrf-csrf';
 
 import * as cookieParser from 'cookie-parser';
+
 import helmet from 'helmet';
 
 import { ApplicationConfigModule } from './configs/config.module';
@@ -13,6 +14,8 @@ import { ApplicationConfig } from './configs/providers/app/application.config';
 import { CsrfConfig } from './configs/providers/csrf/csrf.config';
 import { constantsConfig } from './configs/constantes.config';
 import { HelmetConfig } from './configs/providers/helmet/helmet.config';
+import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipeConfig } from './configs/providers/validation-pipe/validation-pipe.config';
 
 async function bootstrap() {
   const config = await NestFactory.createApplicationContext(
@@ -22,6 +25,20 @@ async function bootstrap() {
   const app = await NestFactory.create(
     AppModule,
     config.get(ApplicationConfig).applicationOptions,
+  );
+
+  /*
+   * Base path da aplicação, excluindo o path /csrf-token
+   */
+  app.setGlobalPrefix(constantsConfig.DEFAULT_PATH, {
+    exclude: ['csrf-token'],
+  });
+
+  /*
+   * Importa e configura de forma global os Pipes do Validation
+   */
+  app.useGlobalPipes(
+    new ValidationPipe(config.get(ValidationPipeConfig).validationPipeOptions),
   );
 
   /*

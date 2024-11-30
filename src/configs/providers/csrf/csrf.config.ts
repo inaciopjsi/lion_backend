@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { DoubleCsrfConfigOptions } from 'csrf-csrf';
-
-import { constantsConfig } from 'src/configs/constantes.config';
 
 /**
  *
@@ -14,11 +12,15 @@ import { constantsConfig } from 'src/configs/constantes.config';
 @Injectable()
 export class CsrfConfig {
   /**
-   * Instancia ConfigService para os valores enviroment.
+   * Creates an instance of CsrfConfig.
+   * @param {*} constantsConfig
    * @param {ConfigService} configService
-   * @memberof ApplicationConfig
+   * @memberof CsrfConfig
    */
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    @Inject('CONTANTS_CONFIG') private constantsConfig,
+    private readonly configService: ConfigService,
+  ) {}
 
   /**
    * Retorna as configuração especificas baseadas na interface DoubleCsrfConfigOptions
@@ -29,7 +31,7 @@ export class CsrfConfig {
    */
   public get csrfOptions(): DoubleCsrfConfigOptions {
     return <DoubleCsrfConfigOptions>{
-      getSecret: () => constantsConfig.SECRET_SESSION,
+      getSecret: () => this.constantsConfig.SECRET_SESSION,
       cookieName: 'CSRF-TOKEN',
       size: 64,
       CookieOptions: {
@@ -39,7 +41,7 @@ export class CsrfConfig {
         httpOnly: true,
         //path: string | undefined,
         //domain: string | undefined,
-        secure: constantsConfig.IS_HTTPS,
+        secure: this.constantsConfig.IS_HTTPS,
         //encode: ((val: string) => string) | undefined,
         sameSite: 'Lax',
       },

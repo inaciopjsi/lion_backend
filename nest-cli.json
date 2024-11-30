@@ -7,14 +7,6 @@
       {
         "include": "mail/system-mail/templates/**/*.hbs",
         "watchAssets": true
-      },
-      {
-        "include": "../assets/public/**/*",
-        "watchAssets": true
-      },
-      {
-        "include": "../assets/uploads/**/*",
-        "watchAssets": true
       }
     ],
     "deleteOutDir": true

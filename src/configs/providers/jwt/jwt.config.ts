@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModuleOptions, JwtOptionsFactory } from '@nestjs/jwt';
-
-import { constantsConfig } from 'src/configs/constantes.config';
 
 import * as fs from 'fs';
 
@@ -19,18 +17,22 @@ export class JwtConfig implements JwtOptionsFactory {
 
   /**
    * Instancia ConfigService para os valores enviroment.
+   * @param {*} constantsConfig
    * @param {ConfigService} configService
    * @memberof JwtConfig
    */
-  constructor(private readonly configService: ConfigService) {}
-
+  constructor(
+    @Inject('CONTANTS_CONFIG') private constantsConfig,
+    private readonly configService: ConfigService,
+  ) {}
   /**
-   * Retorna as configuração especificas baseadas na interface JwtOptions
+   * Creates JWT module options based on the presence of private and public certificates.
+   * If certificates are provided, it returns options for asymmetric signing; otherwise, it uses a secret.
    *
-   * @return {*}  {JwtModuleOptions}
-   * @memberof JwtConfig
+   * @returns {Promise<JwtModuleOptions> | JwtModuleOptions} The JWT module options configuration.
+   * @throws {Error} Throws an error if certificate files cannot be read.
    */
-  createJwtOptions(): JwtModuleOptions {
+  createJwtOptions(): Promise<JwtModuleOptions> | JwtModuleOptions {
     if (
       (this.configService.get('credentials.privateCert'),
       this.configService.get('credentials.publicCert'))
@@ -42,7 +44,7 @@ export class JwtConfig implements JwtOptionsFactory {
           key: fs.readFileSync(
             this.configService.get('credentials.privateCert'),
           ),
-          passphrase: constantsConfig.SECRET_JWT,
+          passphrase: this.constantsConfig.SECRET_JWT,
         },
         publicKey: fs.readFileSync(
           this.configService.get('credentials.publicCert'),
@@ -56,7 +58,7 @@ export class JwtConfig implements JwtOptionsFactory {
     } else {
       return <JwtModuleOptions>{
         global: true,
-        secret: constantsConfig.SECRET_JWT,
+        secret: this.constantsConfig.SECRET_JWT,
       };
     }
   }

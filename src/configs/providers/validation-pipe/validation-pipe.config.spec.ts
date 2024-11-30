@@ -1,27 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
 
-import { HelmetConfig } from './helmet.config';
+import { ValidationPipeConfig } from './validation-pipe.config';
 
 import { constantsConfig } from './../../constantes.config';
+import applicationConfig from './../../enviroments/application.config';
 
-describe('HelmetConfig', () => {
-  let provider: HelmetConfig;
+describe('ValidationPipeConfig', () => {
+  let provider: ValidationPipeConfig;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
-          load: [],
+          load: [applicationConfig],
         }),
       ],
       providers: [
-        HelmetConfig,
+        ValidationPipeConfig,
         { provide: 'CONTANTS_CONFIG', useValue: constantsConfig },
       ],
     }).compile();
 
-    provider = module.get<HelmetConfig>(HelmetConfig);
+    provider = module.get<ValidationPipeConfig>(ValidationPipeConfig);
   });
 
   it('should be defined', () => {

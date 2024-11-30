@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { NestApplicationOptions } from '@nestjs/common/interfaces/nest-application-options.interface';
@@ -6,7 +6,6 @@ import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.int
 
 import * as fs from 'fs';
 
-import { constantsConfig } from 'src/configs/constantes.config';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 
 /**
@@ -18,11 +17,15 @@ import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.i
 @Injectable()
 export class ApplicationConfig {
   /**
-   * Instancia ConfigService para os valores enviroment.
+   * Creates an instance of ApplicationConfig.
+   * @param {*} constantsConfig
    * @param {ConfigService} configService
    * @memberof ApplicationConfig
    */
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    @Inject('CONTANTS_CONFIG') private constantsConfig,
+    private readonly configService: ConfigService,
+  ) {}
 
   /**
    * Retorna as configuração especificas baseadas na interface NestApplicationOptions
@@ -97,7 +100,7 @@ export class ApplicationConfig {
    * @type {({ httpsOptions: { key: any; cert: any; }; } | { httpsOptions?: undefined; })}
    */
   private get httpsOptions(): HttpsOptions {
-    if (constantsConfig.IS_HTTPS) {
+    if (this.constantsConfig.IS_HTTPS) {
       return <HttpsOptions>{
         key: fs.readFileSync(
           this.configService.get<string>('credentials.sslKey'),
@@ -113,22 +116,22 @@ export class ApplicationConfig {
 
   private get logger() {
     const log = [];
-    if (constantsConfig.APPLICATION_LOGS.debug) {
+    if (this.constantsConfig.APPLICATION_LOGS.debug) {
       log.push('debug');
     }
-    if (constantsConfig.APPLICATION_LOGS.error) {
+    if (this.constantsConfig.APPLICATION_LOGS.error) {
       log.push('error');
     }
-    if (constantsConfig.APPLICATION_LOGS.log) {
+    if (this.constantsConfig.APPLICATION_LOGS.log) {
       log.push('log');
     }
-    if (constantsConfig.APPLICATION_LOGS.verbose) {
+    if (this.constantsConfig.APPLICATION_LOGS.verbose) {
       log.push('verbose');
     }
-    if (constantsConfig.APPLICATION_LOGS.warm) {
+    if (this.constantsConfig.APPLICATION_LOGS.warm) {
       log.push('warn');
     }
-    if (constantsConfig.APPLICATION_LOGS.fatal) {
+    if (this.constantsConfig.APPLICATION_LOGS.fatal) {
       log.push('fatal');
     }
     return log;
