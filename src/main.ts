@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { doubleCsrf } from 'csrf-csrf';
 
 import * as cookieParser from 'cookie-parser';
+import * as compression from 'compression';
 
 import helmet from 'helmet';
 
@@ -59,6 +60,7 @@ async function bootstrap() {
     config.get(CsrfConfig).csrfOptions,
   );
   app.use(doubleCsrfProtection);
+  app.use(compression());
 
   //WebServer Start
   if (constantsConfig.IS_HTTPS) {

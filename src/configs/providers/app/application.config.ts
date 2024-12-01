@@ -54,7 +54,7 @@ export class ApplicationConfig {
         //optionsSuccessStatus?: number;
         credentials: true,
         methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-        origin: this.configService.get<string>('server.cors_origin'),
+        origin: this.constantsConfig.CORS_ORIGIN,
         preflightContinue: false,
       },
       bodyParser: true,

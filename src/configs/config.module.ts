@@ -7,12 +7,13 @@ import emailsConfig from 'src/configs/enviroments/emails.config';
 import googleConfig from 'src/configs/enviroments/google.config';
 import mpConfig from 'src/configs/enviroments/mp.config';
 
-import { ApplicationConfig } from './providers/app/application.config';
-import { JwtConfig } from './providers/jwt/jwt.config';
-import { CsrfConfig } from './providers/csrf/csrf.config';
-import { HelmetConfig } from './providers/helmet/helmet.config';
-import { ValidationPipeConfig } from './providers/validation-pipe/validation-pipe.config';
-import { constantsConfig } from './constantes.config';
+import { ApplicationConfig } from 'src/configs/providers/app/application.config';
+import { CsrfConfig } from 'src/configs/providers/csrf/csrf.config';
+import { HelmetConfig } from 'src/configs/providers/helmet/helmet.config';
+import { ValidationPipeConfig } from 'src/configs/providers/validation-pipe/validation-pipe.config';
+import { MpConfig } from 'src/configs/providers/mp/mp.config';
+
+import { constantsConfig } from 'src/configs/constantes.config';
 
 @Global()
 @Module({
@@ -32,8 +33,8 @@ import { constantsConfig } from './constantes.config';
     ApplicationConfig,
     CsrfConfig,
     HelmetConfig,
-    JwtConfig,
     ValidationPipeConfig,
+    MpConfig,
     { provide: 'CONTANTS_CONFIG', useValue: constantsConfig },
   ],
 })

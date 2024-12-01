@@ -2,7 +2,6 @@ import { Schema, Types } from 'mongoose';
 
 export const MenuSchema: Schema = new Schema(
   {
-    id: Types.ObjectId,
     name: String,
     label: String,
     root: Boolean,
