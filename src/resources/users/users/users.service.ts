@@ -10,16 +10,18 @@ import * as mongoose from 'mongoose';
 import { BcryptHelper } from 'src/helpers/bcrypt.helper';
 import { FileHelper } from 'src/helpers/file.helper';
 
-import { RolesService } from '../roles/roles.service';
+import { RolesService } from 'src/resources/users/roles/roles.service';
 
 import { IUser } from 'src/connections/users/users/users.interface';
 
-import { CreateGoogleUserDto } from './dto/create-google-user.dto';
-import { CreateSiteUserDto } from './dto/create-site-user.dto';
-import { UpdatePasswordUserDto } from './dto/update-password-user.dto';
-import { UpdateSiteUserDto } from './dto/update-site-user.dto';
-import { VerifyEmailSiteUserDto } from './dto/verify-email-site-user.dto';
-import { VerifyUserNameSiteUserDto } from './dto/verify-user-name-site-user.dto';
+import { CreateAdminUserDto } from 'src/resources/users/users/dto/create-admin-user.dto';
+import { CreateGoogleUserDto } from 'src/resources/users/users/dto/create-google-user.dto';
+import { CreateSiteUserDto } from 'src/resources/users/users/dto/create-site-user.dto';
+import { UpdateAdminUserDto } from 'src/resources/users/users/dto/update-admin-user.dto';
+import { UpdatePasswordUserDto } from 'src/resources/users/users/dto/update-password-user.dto';
+import { UpdateSiteUserDto } from 'src/resources/users/users/dto/update-site-user.dto';
+import { VerifyEmailSiteUserDto } from 'src/resources/users/users/dto/verify-email-site-user.dto';
+import { VerifyUserNameSiteUserDto } from 'src/resources/users/users/dto/verify-user-name-site-user.dto';
 
 /**
  * Class that returns data from different users (Used by administrators)
@@ -65,6 +67,48 @@ export class UsersService {
    * @param {CreateSiteUserDto} createSiteUserDto  Validated user data
    * @returns {Promise<User>} User entered.
    */
+  async createAdminUser(
+    createAdminUserDto: CreateAdminUserDto,
+  ): Promise<IUser> {
+    const insert = <any>createAdminUserDto;
+    insert.roles = await this.rolesService.getRolesIdsByNameArray(
+      createAdminUserDto.roles,
+    );
+    insert.password = Boolean(insert.password)
+      ? await this.bcryptHelper.encrypt(insert.password)
+      : await this.bcryptHelper.encrypt(randomUUID());
+    if (!insert.label) {
+      insert.label = '';
+    }
+    delete insert.id;
+    const newUser = new this.userModel(insert);
+    return newUser.save();
+  }
+
+  async updateAdminUser(
+    id: string | mongoose.Types.ObjectId,
+    updateAdminUserDto: UpdateAdminUserDto,
+  ) {
+    const update = <any>updateAdminUserDto;
+    update.roles = await this.rolesService.getRolesIdsByNameArray(
+      updateAdminUserDto.roles,
+    );
+    delete update.id;
+    update.password = Boolean(update.password)
+      ? await this.bcryptHelper.encrypt(update.password)
+      : await this.bcryptHelper.encrypt(randomUUID());
+    if (!update.label) {
+      update.label = '';
+    }
+    delete update.id;
+    return this.userModel.updateOne({ id }, update);
+  }
+
+  /**
+   * User creation from the administrator form.
+   * @param {CreateSiteUserDto} createSiteUserDto  Validated user data
+   * @returns {Promise<User>} User entered.
+   */
   async createSiteUser(createSiteUserDto: CreateSiteUserDto): Promise<IUser> {
     const insert = <any>{ ...createSiteUserDto };
     insert.roleIDs = await this.rolesService.getRolesIdsByNameArray(['USER']);
@@ -101,7 +145,10 @@ export class UsersService {
    * @param {UpdateSiteUserDto} updateSiteUserDto  New validated user data
    * @returns {Promise<User>} User changed.
    */
-  async updateUser(userId: string, updateSiteUserDto: UpdateSiteUserDto) {
+  async updateUser(
+    id: string | mongoose.Types.ObjectId,
+    updateSiteUserDto: UpdateSiteUserDto,
+  ) {
     const update = <any>{ ...updateSiteUserDto };
     if (updateSiteUserDto.avatar!) {
       const newPath =
@@ -115,12 +162,12 @@ export class UsersService {
         }
         delete update.roles;
         delete update.id;
-        return this.userModel.updateOne({ id: userId }, update);
+        return this.userModel.updateOne({ id }, update);
       });
     } else {
       delete update.roles;
       delete update.id;
-      return this.userModel.updateOne({ id: userId }, update);
+      return this.userModel.updateOne({ id }, update);
     }
   }
 

@@ -15,20 +15,7 @@ export const RoleSchema: Schema = new Schema(
       type: Boolean,
       default: false,
     },
-    permissions: [
-      {
-        permissionId: Types.ObjectId,
-        enabled: {
-          type: Boolean,
-          default: false,
-        },
-      },
-      {
-        _id: false,
-        strict: true,
-        strictQuery: false,
-      },
-    ],
+    permissions: [Types.ObjectId],
     createdAt: Date,
     updatedAt: Date,
   },

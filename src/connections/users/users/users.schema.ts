@@ -68,18 +68,11 @@ export const UserSchema: Schema = new Schema(
     displayNickname: String,
     activationToken: String,
     refreshToken: String,
+    googleRefreshToken: String,
+    recoveryToken: String,
+    recoveryExpire: Date,
     hash: String,
-    roles: [
-      {
-        roleId: Types.ObjectId,
-        enabled: Boolean,
-      },
-      {
-        _id: false,
-        strict: true,
-        strictQuery: false,
-      },
-    ],
+    roles: [Types.ObjectId],
     socialNetworks: [
       {
         name: String,

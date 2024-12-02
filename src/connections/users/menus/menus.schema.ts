@@ -16,12 +16,7 @@ export const MenuSchema: Schema = new Schema(
     enabled: Boolean,
     permanent: Boolean,
     visible: Boolean,
-    roles: [
-      {
-        roleId: Types.ObjectId,
-        enabled: Boolean,
-      },
-    ],
+    roles: [Types.ObjectId],
     createdAt: Date,
     updatedAt: Date,
   },

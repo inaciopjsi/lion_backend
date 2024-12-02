@@ -56,5 +56,5 @@ export class CreateSiteMenuDto {
 
   @IsArray()
   @ArrayNotEmpty()
-  roles: any[];
+  roles: string[];
 }

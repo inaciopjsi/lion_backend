@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsNotEmpty,
   IsOptional,
@@ -19,4 +20,8 @@ export class CreateSiteRoleDto {
   @IsBoolean()
   @IsOptional()
   readonly permanent: boolean;
+
+  @IsArray()
+  @IsOptional()
+  permissions: string[];
 }

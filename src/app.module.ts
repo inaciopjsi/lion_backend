@@ -25,7 +25,6 @@ import { SalesConnectionsModule } from 'src/connections/sales.connections.module
 import { UsersConnectionsModule } from 'src/connections/users.connections.module';
 
 import { AuthModule } from 'src/resources/users/auth/auth.module';
-import { MenusModule } from 'src/resources/users/menus/menus.module';
 import { UserModule } from 'src/resources/users/user/user.module';
 
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -60,7 +59,6 @@ import { JwtAuthStrategy } from 'src/middlewares/jwt-auth.strategy';
     UsersConnectionsModule,
     AuthModule,
     UserModule,
-    MenusModule,
   ],
   controllers: [CsrfTokenController, SecurityController],
   providers: [

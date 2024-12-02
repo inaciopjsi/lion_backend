@@ -6,12 +6,7 @@ export interface IRole extends Document {
   description: string;
   enabled: boolean;
   permanent: boolean;
-  permissions: [
-    {
-      permissionId: Types.ObjectId;
-      enabled: boolean;
-    },
-  ];
+  permissions: [Types.ObjectId];
   createdAt: Date;
   updatedAt: Date;
 }

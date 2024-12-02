@@ -1,22 +1,17 @@
 import { Module } from '@nestjs/common';
 
-import { UserController } from './user.controller';
-import { UserService } from './user.service';
 import { BcryptHelper } from 'src/helpers/bcrypt.helper';
-import { RolesService } from 'src/resources/users/roles/roles.service';
-import { MenusService } from 'src/resources/users/menus/menus.service';
-import { UsersService } from 'src/resources/users/users/users.service';
+
+import { UsersModule } from 'src/resources/users/users/users.module';
+import { MenusModule } from 'src/resources/users/menus/menus.module';
+
+import { UserController } from 'src/resources/users/user/user.controller';
+import { UserService } from 'src/resources/users/user/user.service';
 
 @Module({
-  imports: [],
+  imports: [UsersModule, MenusModule],
   controllers: [UserController],
-  providers: [
-    UserService,
-    UsersService,
-    MenusService,
-    RolesService,
-    BcryptHelper,
-  ],
+  providers: [UserService, BcryptHelper],
   exports: [UserService],
 })
 export class UserModule {}

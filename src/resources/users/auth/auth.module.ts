@@ -12,19 +12,15 @@ import { UsersModule } from 'src/resources/users/users/users.module';
 import { SignInStrategy } from 'src/middlewares/signin.strategy';
 import { JwtRefreshStrategy } from 'src/middlewares/jwt-refresh.strategy';
 import { JwtConfig } from 'src/configs/providers/jwt/jwt.config';
-import { constantsConfig } from 'src/configs/constantes.config';
 
 @Module({
   imports: [
     JwtModule.registerAsync(<JwtModuleAsyncOptions>{
       useClass: JwtConfig,
-      extraProviders: [
-        { provide: 'CONTANTS_CONFIG', useValue: constantsConfig },
-      ],
     }),
+    UsersModule,
     RolesModule,
     UserModule,
-    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, BcryptHelper, SignInStrategy, JwtRefreshStrategy],

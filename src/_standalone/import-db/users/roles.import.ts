@@ -5,8 +5,21 @@ import { UpdateSiteRoleDto } from 'src/resources/users/roles/dto/update-site-rol
 
 import { RolesService } from 'src/resources/users/roles/roles.service';
 
+/**
+ *
+ *
+ * @export
+ * @class RolesImport
+ */
 @Injectable()
 export class RolesImport {
+  /**
+   *
+   *
+   * @private
+   * @static
+   * @memberof RolesImport
+   */
   private static startRolesArray = [
     {
       name: 'SUPER_ADMIN',
@@ -48,12 +61,26 @@ export class RolesImport {
 
   constructor(private readonly rolesService: RolesService) {}
 
+  /**
+   *
+   *
+   * @return {*}
+   * @memberof RolesImport
+   */
   async start() {
     return await this._addRole(RolesImport.startRolesArray);
   }
 
+  /**
+   *
+   *
+   * @private
+   * @param {any[]} roles
+   * @return {*}  {Promise<void>}
+   * @memberof RolesImport
+   */
   private async _addRole(roles: any[]): Promise<void> {
-    const promisesRole = roles.map(async (role: any) => {
+    const promisesRoles = roles.map(async (role: any) => {
       return await this.rolesService
         .getRoleByName(role.name)
         .then(async (_oldRole: any) => {
@@ -66,6 +93,6 @@ export class RolesImport {
             : await this.rolesService.createRole(newRole);
         });
     });
-    await Promise.all(promisesRole);
+    await Promise.all(promisesRoles);
   }
 }

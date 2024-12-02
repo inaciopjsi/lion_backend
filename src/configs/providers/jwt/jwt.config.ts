@@ -21,10 +21,7 @@ export class JwtConfig implements JwtOptionsFactory {
    * @param {ConfigService} configService
    * @memberof JwtConfig
    */
-  constructor(
-    @Inject('CONTANTS_CONFIG') private constantsConfig,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly configService: ConfigService) {}
   /**
    * Creates JWT module options based on the presence of private and public certificates.
    * If certificates are provided, it returns options for asymmetric signing; otherwise, it uses a secret.
@@ -32,7 +29,7 @@ export class JwtConfig implements JwtOptionsFactory {
    * @returns {Promise<JwtModuleOptions> | JwtModuleOptions} The JWT module options configuration.
    * @throws {Error} Throws an error if certificate files cannot be read.
    */
-  createJwtOptions(): Promise<JwtModuleOptions> | JwtModuleOptions {
+  createJwtOptions(): JwtModuleOptions {
     if (
       (this.configService.get('credentials.privateCert'),
       this.configService.get('credentials.publicCert'))
@@ -44,7 +41,7 @@ export class JwtConfig implements JwtOptionsFactory {
           key: fs.readFileSync(
             this.configService.get('credentials.privateCert'),
           ),
-          passphrase: this.constantsConfig.SECRET_JWT,
+          passphrase: this.configService.get('credentials.secretJwt'),
         },
         publicKey: fs.readFileSync(
           this.configService.get('credentials.publicCert'),
@@ -58,7 +55,7 @@ export class JwtConfig implements JwtOptionsFactory {
     } else {
       return <JwtModuleOptions>{
         global: true,
-        secret: this.constantsConfig.SECRET_JWT,
+        passphrase: this.configService.get('credentials.secretJwt'),
       };
     }
   }

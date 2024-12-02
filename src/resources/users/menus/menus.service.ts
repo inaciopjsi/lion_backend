@@ -1,55 +1,69 @@
 import { Inject, Injectable } from '@nestjs/common';
 
+import * as mongoose from 'mongoose';
+
 import { IMenu } from 'src/connections/users/menus/menus.interface';
 
-import { CreateSiteMenuDto } from './dto/create-site-menu.dto';
-import { UpdateSiteMenuDto } from './dto/update-site-menu.dto';
-import { VerifyNameSiteMenuDto } from './dto/verify-name-site-menu.dto';
+import { RolesService } from 'src/resources/users/roles/roles.service';
 
-import * as mongoose from 'mongoose';
+import { CreateSiteMenuDto } from 'src/resources/users/menus/dto/create-site-menu.dto';
+import { UpdateSiteMenuDto } from 'src/resources/users/menus/dto/update-site-menu.dto';
+import { VerifyNameSiteMenuDto } from 'src/resources/users/menus/dto/verify-name-site-menu.dto';
 
 @Injectable()
 export class MenusService {
   constructor(
     @Inject('MENU_MODEL')
     private menuModel: mongoose.Model<IMenu>,
+    private readonly rolesService: RolesService,
   ) {}
 
   async createMenu(createSiteMenuDto: CreateSiteMenuDto): Promise<any> {
     const insert = <any>createSiteMenuDto;
-    insert.root = Boolean(!createSiteMenuDto.parent);
-    insert.parentId = <string>createSiteMenuDto.parent;
-    insert.roleIDs = <string[]>createSiteMenuDto.roles;
-    insert.permanent = insert.permanent || false;
-    delete insert.roles;
-    delete insert.parent;
     delete insert.id;
-    return this.menuModel.create({
-      data: <any>createSiteMenuDto,
-    });
+    insert.root = Boolean(!createSiteMenuDto.parent);
+    insert.parentId = Boolean(createSiteMenuDto.parent)
+      ? (await this.getMenuIdByName(createSiteMenuDto.parent))?._id || undefined
+      : undefined;
+    const rolesArray = await this.rolesService.getRolesIdsByNameArray(
+      createSiteMenuDto.roles,
+    );
+    insert.roles = rolesArray;
+    insert.permanent = insert.permanent || false;
+    insert.createdAt = Date.now();
+    insert.updatedAt = Date.now();
+    const newMenu = new this.menuModel(insert);
+    return newMenu.save();
   }
 
-  async updateMenu(menuId: string, updateSiteMenuDto: UpdateSiteMenuDto) {
+  async updateMenu(
+    id: string | mongoose.Types.ObjectId,
+    updateSiteMenuDto: UpdateSiteMenuDto,
+  ) {
     const update = <any>updateSiteMenuDto;
-    update.root = Boolean(!updateSiteMenuDto.parent);
-    update.parentId = <string>updateSiteMenuDto.parent;
-    update.roleIDs = <string[]>updateSiteMenuDto.roles;
-    update.permanent = update.permanent || false;
-    delete update.roles;
-    delete update.parent;
     delete update.id;
-    return this.menuModel.findByIdAndUpdate(menuId, update);
+    update.root = Boolean(!updateSiteMenuDto.parent);
+    update.parentId = Boolean(updateSiteMenuDto.parent)
+      ? (await this.getMenuIdByName(updateSiteMenuDto.parent))._id
+      : null;
+    const rolesArray = await this.rolesService.getRolesIdsByNameArray(
+      updateSiteMenuDto.roles,
+    );
+    update.roles = rolesArray;
+    update.permanent = update.permanent || false;
+    update.updatedAt = Date.now();
+    return this.menuModel.findByIdAndUpdate(id, update);
   }
 
   async getMenuByName(name: string) {
     return this.menuModel.findOne({ name });
   }
 
-  async getMenuIdByName(parentName: string) {
+  async getMenuIdByName(menuName: string) {
     return this.menuModel
-      .findOne({ name: parentName })
+      .findOne({ name: menuName })
       .select({ id: true })
-      .then();
+      .exec();
   }
 
   async getAllMenus(isSuperAdmin: boolean) {

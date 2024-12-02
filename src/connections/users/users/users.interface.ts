@@ -16,13 +16,11 @@ export interface IUser extends Document {
   displayNickname: string;
   activationToken: string;
   refreshToken: string;
+  googleRefreshToken: string;
+  recoveryToken: string;
+  recoveryExpire: Date;
   hash: string;
-  roles: [
-    {
-      roleId: Types.ObjectId;
-      enabled: boolean;
-    },
-  ];
+  roles: [Types.ObjectId];
   socialNetworks: [
     {
       name: string;

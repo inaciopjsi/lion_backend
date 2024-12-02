@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { CreateSiteUserDto } from 'src/resources/users/users/dto/create-site-user.dto';
-import { UpdateSiteUserDto } from 'src/resources/users/users/dto/update-site-user.dto';
+import { CreateAdminUserDto } from 'src/resources/users/users/dto/create-admin-user.dto';
+import { UpdateAdminUserDto } from 'src/resources/users/users/dto/update-admin-user.dto';
 
 import { UsersService } from 'src/resources/users/users/users.service';
-import { RolesService } from 'src/resources/users/roles/roles.service';
+import { IUser } from 'src/connections/users/users/users.interface';
 
 @Injectable()
 export class UsersImport {
@@ -19,31 +19,26 @@ export class UsersImport {
     },
   ];
 
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly rolesService: RolesService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   async start() {
     return await this._addUser(UsersImport.startUsersArray);
   }
 
   private async _addUser(users: any[]): Promise<void> {
-    users.forEach(async (user) => {
-      let userInserted: any;
-      const newUser = user as CreateSiteUserDto;
-      const _oldUser = (await this.usersService.getUserByEmail(
-        user.email,
-      )) as any;
-      newUser.roles =
-        (await this.rolesService.getRolesIdsByNameArray(user.roles)) || [];
-      !!_oldUser
-        ? (userInserted = await this.usersService.updateUser(
-            _oldUser.id,
-            newUser as UpdateSiteUserDto,
-          ))
-        : (userInserted = await this.usersService.createUser(newUser));
-      await this.usersService.setPasswordUser(userInserted.id, user.password);
+    const promisesUsers = users.map(async (user) => {
+      return await this.usersService
+        .getUserByEmail(user.email)
+        .then(async (_oldUser: IUser) => {
+          const newUser = user as CreateAdminUserDto;
+          !!_oldUser
+            ? await this.usersService.updateAdminUser(
+                _oldUser.id,
+                newUser as UpdateAdminUserDto,
+              )
+            : await this.usersService.createAdminUser(newUser);
+        });
     });
+    await Promise.all(promisesUsers);
   }
 }

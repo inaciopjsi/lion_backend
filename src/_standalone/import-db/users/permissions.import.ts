@@ -5,8 +5,21 @@ import { UpdateSitePermissionDto } from 'src/resources/users/permissions/dto/upd
 
 import { PermissionsService } from 'src/resources/users/permissions/permissions.service';
 
+/**
+ *
+ *
+ * @export
+ * @class PermissionsImport
+ */
 @Injectable()
 export class PermissionsImport {
+  /**
+   *
+   *
+   * @private
+   * @static
+   * @memberof PermissionsImport
+   */
   private static startPermissionsArray = [
     {
       name: 'FULL_CONTROL',
@@ -65,12 +78,31 @@ export class PermissionsImport {
     },
   ];
 
+  /**
+   * Creates an instance of PermissionsImport.
+   * @param {PermissionsService} permissionsService
+   * @memberof PermissionsImport
+   */
   constructor(private readonly permissionsService: PermissionsService) {}
 
+  /**
+   *
+   *
+   * @return {*}
+   * @memberof PermissionsImport
+   */
   async start() {
     return await this._addPermission(PermissionsImport.startPermissionsArray);
   }
 
+  /**
+   *
+   *
+   * @private
+   * @param {any[]} permissions
+   * @return {*}  {Promise<void>}
+   * @memberof PermissionsImport
+   */
   private async _addPermission(permissions: any[]): Promise<void> {
     const promisesPermission = permissions.map(async (permission: any) => {
       return await this.permissionsService

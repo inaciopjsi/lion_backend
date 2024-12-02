@@ -32,6 +32,8 @@ export class PermissionsService {
   ): Promise<any> {
     const insert = <any>createSitePermissionDto;
     insert.permanent = insert.permanent || false;
+    insert.createdAt = Date.now();
+    insert.updatedAt = Date.now();
     delete insert.id;
     return this.permissionModel.insertMany(insert);
   }
@@ -49,6 +51,7 @@ export class PermissionsService {
     const update = <any>updateSitePermissionDto;
     delete update.id;
     update.permanent = update.permanent || false;
+    update.updatedAt = Date.now();
     return this.permissionModel.findByIdAndUpdate(id, update);
   }
 
@@ -58,7 +61,7 @@ export class PermissionsService {
    * @returns
    */
   async findPermissionsByArray(permissionsIds: any[]): Promise<any[] | null> {
-    return this.permissionModel.find({ id: { in: permissionsIds } }).then();
+    return this.permissionModel.find({ id: { $in: permissionsIds } }).then();
   }
 
   /**
@@ -208,7 +211,7 @@ export class PermissionsService {
   async getPermissionsByNameArray(permissions: string[]) {
     return this.permissionModel
       .find({
-        name: { in: permissions },
+        name: { $in: permissions },
       })
       .select({
         id: true,
@@ -225,14 +228,11 @@ export class PermissionsService {
    * @returns
    */
   async getPermissionsIdsByNameArray(permissions: string[]) {
-    return (
-      await this.permissionModel
-        .find({ name: { in: permissions } })
-        .select({
-          id: true,
-        })
-        .then()
-    ).map((permission) => permission.id);
+    return await this.permissionModel
+      .find({ name: { $in: permissions } })
+      .select({
+        id: true,
+      });
   }
 
   /**

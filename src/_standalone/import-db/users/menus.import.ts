@@ -1,8 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { IMenu } from 'src/connections/users/menus/menus.interface';
+import { CreateSiteMenuDto } from 'src/resources/users/menus/dto/create-site-menu.dto';
+import { UpdateSiteMenuDto } from 'src/resources/users/menus/dto/update-site-menu.dto';
 
 import { MenusService } from 'src/resources/users/menus/menus.service';
 import { RolesService } from 'src/resources/users/roles/roles.service';
 
+/**
+ *
+ *
+ * @export
+ * @class MenusImport
+ */
 @Injectable()
 export class MenusImport {
   private static startMenusArray = [
@@ -22,7 +31,7 @@ export class MenusImport {
       label: 'Dashboard',
       root: false,
       description: 'Home / dashboard',
-      parentName: 'SITE',
+      parent: 'SITE',
       iconImg: 'assets/img/icons/bag.svg',
       routerLink: '/content/dashboard',
       internal: true,
@@ -37,7 +46,7 @@ export class MenusImport {
       label: 'Profile',
       root: false,
       description: 'Home / profile',
-      parentName: 'SITE',
+      parent: 'SITE',
       routerLink: '/content/profile',
       internal: true,
       admin: false,
@@ -62,7 +71,7 @@ export class MenusImport {
       label: 'Dashboard',
       root: false,
       description: 'Administração / dashboard',
-      parentName: 'ADMIN',
+      parent: 'ADMIN',
       iconImg: 'assets/img/icons/bag.svg',
       routerLink: '/manager/dashboard',
       internal: true,
@@ -77,7 +86,7 @@ export class MenusImport {
       label: 'Gerenciamento',
       root: false,
       description: 'Menu Administração / Gerenciamento',
-      parentName: 'ADMIN',
+      parent: 'ADMIN',
       admin: true,
       enabled: true,
       permanent: true,
@@ -89,7 +98,7 @@ export class MenusImport {
       label: 'Menus',
       root: false,
       description: 'Menu Administração / Gerenciamento / Menus',
-      parentName: 'ADMIN_MANAGER',
+      parent: 'ADMIN_MANAGER',
       iconImg: 'assets/img/icons/bookshelf.png',
       routerLink: '/manager/menus',
       internal: true,
@@ -104,7 +113,7 @@ export class MenusImport {
       label: 'Financeiro',
       root: false,
       description: 'Menu Administração / Gerenciamento / Financeiro',
-      parentName: 'ADMIN_MANAGER',
+      parent: 'ADMIN_MANAGER',
       internal: true,
       admin: true,
       enabled: true,
@@ -117,7 +126,7 @@ export class MenusImport {
       label: 'Itens',
       root: false,
       description: 'Menu Administração / Gerenciamento / Financeiro / Itens',
-      parentName: 'ADMIN_MANAGER_SALES',
+      parent: 'ADMIN_MANAGER_SALES',
       iconImg: 'assets/img/icons/cardboard-box.png',
       routerLink: '/manager/items',
       internal: true,
@@ -132,7 +141,7 @@ export class MenusImport {
       label: 'Produtos',
       root: false,
       description: 'Menu Administração / Gerenciamento / Financeiro / Produtos',
-      parentName: 'ADMIN_MANAGER_SALES',
+      parent: 'ADMIN_MANAGER_SALES',
       iconImg: 'assets/img/icons/cardboard-box.png',
       routerLink: '/manager/products',
       internal: true,
@@ -147,7 +156,7 @@ export class MenusImport {
       label: 'Planos',
       root: false,
       description: 'Menu Administração / Gerenciamento / Financeiro / Planos',
-      parentName: 'ADMIN_MANAGER_SALES',
+      parent: 'ADMIN_MANAGER_SALES',
       iconImg: 'assets/img/icons/cardboard-box.png',
       routerLink: '/manager/plans',
       internal: true,
@@ -162,7 +171,7 @@ export class MenusImport {
       label: 'Usuários',
       root: false,
       description: 'Menu Administração / Gerenciamento / Usuários',
-      parentName: 'ADMIN_MANAGER',
+      parent: 'ADMIN_MANAGER',
       admin: true,
       enabled: true,
       permanent: true,
@@ -175,7 +184,7 @@ export class MenusImport {
       root: false,
       description:
         'Menu Administração / Gerenciamento / Usuários / Tipos de Usuários',
-      parentName: 'ADMIN_MANAGER_USERS',
+      parent: 'ADMIN_MANAGER_USERS',
       iconImg: 'assets/img/icons/roles.png',
       routerLink: '/manager/roles',
       internal: true,
@@ -190,7 +199,7 @@ export class MenusImport {
       label: 'Permissões',
       root: false,
       description: 'Menu Administração / Gerenciamento / Usuários / Permissões',
-      parentName: 'ADMIN_MANAGER_USERS',
+      parent: 'ADMIN_MANAGER_USERS',
       iconImg: 'assets/img/icons/roles.png',
       routerLink: '/manager/permissions',
       internal: true,
@@ -205,7 +214,7 @@ export class MenusImport {
       label: 'Usuários',
       root: false,
       description: 'Menu Administração / Gerenciamento / Usuários / Usuários',
-      parentName: 'ADMIN_MANAGER_USERS',
+      parent: 'ADMIN_MANAGER_USERS',
       iconImg: 'assets/img/icons/user-account.png',
       routerLink: '/manager/users',
       internal: true,
@@ -217,34 +226,49 @@ export class MenusImport {
     },
   ];
 
+  /**
+   * Creates an instance of MenusImport.
+   * @param {MenusService} menusService
+   * @param {RolesService} rolesService
+   * @memberof MenusImport
+   */
   constructor(
     private readonly menusService: MenusService,
     private readonly rolesService: RolesService,
   ) {}
 
+  /**
+   *
+   *
+   * @return {*}
+   * @memberof MenusImport
+   */
   async start() {
     return await this._addMenu(MenusImport.startMenusArray);
   }
 
+  /**
+   *
+   *
+   * @private
+   * @param {any[]} menus
+   * @return {*}  {Promise<void>}
+   * @memberof MenusImport
+   */
   private async _addMenu(menus: any[]): Promise<void> {
-    menus.map(async (menu) => {
-      const newMenu = menu as any;
-      const _oldMenu = (await this.menusService.getMenuByName(
-        menu.name,
-      )) as any;
-      const _parentMenu = Boolean(menu.parentName)
-        ? await this.menusService.getMenuIdByName(menu.parentName)
-        : null;
-      const _rolesArrayDb = (await this.rolesService.getRolesByNameArray(
-        menu.roles,
-      )) as any[];
-      newMenu.roles = _rolesArrayDb?.map((role) => role.id) || [];
-      newMenu.parent = _parentMenu?.id;
-      delete newMenu.parentName;
-      !!_oldMenu
-        ? await this.menusService.updateMenu(_oldMenu.id, newMenu)
-        : await this.menusService.createMenu(newMenu);
-      return;
+    const promisesMenus = menus.map(async (menu) => {
+      return await this.menusService
+        .getMenuByName(menu.name)
+        .then(async (_oldMenu: IMenu) => {
+          const newMenu = menu as CreateSiteMenuDto;
+          !!_oldMenu
+            ? await this.menusService.updateMenu(
+                _oldMenu.id,
+                newMenu as UpdateSiteMenuDto,
+              )
+            : await this.menusService.createMenu(newMenu);
+        });
     });
+    await Promise.all(promisesMenus);
   }
 }

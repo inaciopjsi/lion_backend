@@ -1,11 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { CreateSiteRoleDto } from './dto/create-site-role.dto';
-import { UpdateSiteRoleDto } from './dto/update-site-role.dto';
+import * as mongoose from 'mongoose';
 
 import { IRole } from 'src/connections/users/roles/roles.interfaces';
 
-import { Model } from 'mongoose';
+import { CreateSiteRoleDto } from 'src/resources/users/roles/dto/create-site-role.dto';
+import { UpdateSiteRoleDto } from 'src/resources/users/roles/dto/update-site-role.dto';
+
+import { PermissionsService } from 'src/resources/users/permissions/permissions.service';
 
 /**
  *
@@ -13,13 +15,15 @@ import { Model } from 'mongoose';
 @Injectable()
 export class RolesService {
   /**
-   * @ignore
-   * @param prismaService
-   *
+   * Creates an instance of RolesService.
+   * @param {mongoose.Model<IRole>} roleModel
+   * @param {PermissionsService} permissionsService
+   * @memberof RolesService
    */
   constructor(
     @Inject('ROLE_MODEL')
-    private roleModel: Model<IRole>,
+    private roleModel: mongoose.Model<IRole>,
+    private readonly permissionsService: PermissionsService,
   ) {}
 
   /**
@@ -29,10 +33,17 @@ export class RolesService {
    */
   async createRole(createSiteRoleDto: CreateSiteRoleDto): Promise<IRole> {
     const insert = <any>createSiteRoleDto;
-    insert.permanent = insert.permanent || false;
     delete insert.id;
-    const createdRole = new this.roleModel(insert);
-    return createdRole.save();
+    insert.permanent = insert.permanent || false;
+    const permissionsArray =
+      await this.permissionsService.getPermissionsIdsByNameArray(
+        createSiteRoleDto.permissions,
+      );
+    insert.permissions = permissionsArray;
+    insert.createdAt = Date.now();
+    insert.updatedAt = Date.now();
+    const newRole = new this.roleModel(insert);
+    return newRole.save();
   }
 
   /**
@@ -41,10 +52,19 @@ export class RolesService {
    * @param updateSiteRoleDto
    * @returns
    */
-  async updateRole(id: any, updateSiteRoleDto: UpdateSiteRoleDto) {
+  async updateRole(
+    id: string | mongoose.Types.ObjectId,
+    updateSiteRoleDto: UpdateSiteRoleDto,
+  ) {
     const update = <any>updateSiteRoleDto;
     delete update.id;
+    const permissionsArray =
+      await this.permissionsService.getPermissionsIdsByNameArray(
+        updateSiteRoleDto.permissions,
+      );
+    update.permissions = permissionsArray;
     update.permanent = update.permanent || false;
+    update.updatedAt = Date.now();
     return this.roleModel.findByIdAndUpdate(id, update);
   }
 
@@ -275,14 +295,9 @@ export class RolesService {
    * @returns
    */
   async getRolesIdsByNameArray(roles: string[]) {
-    return (
-      await this.roleModel
-        .find({ name: { in: roles } })
-        .select({
-          id: true,
-        })
-        .exec()
-    ).map((role) => role._id);
+    return await this.roleModel.find({ name: { $in: roles } }).select({
+      id: true,
+    });
   }
 
   /**

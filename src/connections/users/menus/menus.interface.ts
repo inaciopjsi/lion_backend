@@ -16,12 +16,7 @@ export interface IMenu extends Document {
   enabled: boolean;
   permanent: boolean;
   visible: boolean;
-  roles: [
-    {
-      roleId: Types.ObjectId;
-      enabled: boolean;
-    },
-  ];
+  roles: [Types.ObjectId];
   createdAt: Date;
   updatedAt: Date;
 }

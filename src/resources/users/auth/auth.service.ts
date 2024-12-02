@@ -45,7 +45,7 @@ export class AuthService {
   }
 
   async getJwtToken(user: any, keepLogged = false) {
-    const rolesIds = ArrayHelper.uniqueArray(user.roleIDs);
+    const rolesIds = ArrayHelper.uniqueArray(user.roles);
     return this.rolesService.findRolesByArray(rolesIds).then(async (roles) => {
       const rolesNames: string[] = [];
       roles?.forEach((role) => {
@@ -148,7 +148,7 @@ export class AuthService {
     const ExpireIn = moment().unix() + 60 * 15;
 
     return {
-      token: this.jwtService.sign({
+      token: this.jwtService.signAsync({
         id: id,
         roles: rolesNames,
         expiresIn: ExpireIn,
@@ -173,9 +173,7 @@ export class AuthService {
       loginUser.email,
       req.user.refreshToken,
     );
-    const rolesIds = ArrayHelper.uniqueArray(
-      user.roles.map((role) => role.roleId),
-    );
+    const rolesIds = user.roles;
     return this.rolesService.findRolesByArray(rolesIds).then(async (roles) => {
       const rolesNames: string[] = [];
       roles?.forEach((role) => {

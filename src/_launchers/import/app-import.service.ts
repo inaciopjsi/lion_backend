@@ -16,7 +16,9 @@ export class AppImportService {
     this.permissionsImport.start().then(() => {
       this.rolesImport.start().then(() => {
         this.menusImport.start().then(() => {
-          this.usersImport.start().then();
+          this.menusImport.start().then(() => {
+            this.usersImport.start().then();
+          });
         });
       });
     });
