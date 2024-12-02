@@ -54,7 +54,7 @@ export class UserService {
    * @returns {Promise<IUser>} User data.
    */
   async getMySelf(id: string): Promise<IUserBase> {
-    return await this.usersService.getAnyUserById(id).then();
+    return await this.usersService.getAnyUserById(id);
   }
 
   /**

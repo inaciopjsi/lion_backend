@@ -16,9 +16,7 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt-auth') {
     private readonly userService: UserService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: fs.readFileSync(configService.get('credentials.publicCert')),
     });
   }

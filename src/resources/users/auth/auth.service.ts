@@ -148,7 +148,7 @@ export class AuthService {
     const ExpireIn = moment().unix() + 60 * 15;
 
     return {
-      token: this.jwtService.signAsync({
+      token: this.jwtService.sign({
         id: id,
         roles: rolesNames,
         expiresIn: ExpireIn,

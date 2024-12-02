@@ -325,9 +325,16 @@ export class UsersService {
    * @returns {Promise<IUser>} User data.
    */
   async getAnyUserById(userId: string): Promise<any> {
-    return await this.userModel
-      .findById(userId)
-      .select({
+    const user = await this.userModel
+      .aggregate()
+      .match({ _id: new mongoose.Types.ObjectId(userId) })
+      .lookup({
+        from: 'roles',
+        localField: 'roles',
+        foreignField: '_id',
+        as: 'roles',
+      })
+      .project({
         id: true,
         name: true,
         email: true,
@@ -335,13 +342,13 @@ export class UsersService {
         label: true,
         refreshToken: true,
         roles: {
-          select: {
-            id: true,
-            name: true,
-          },
+          _id: true,
+          name: true,
         },
       })
-      .exec();
+      .limit(1);
+
+    return user.length > 0 ? user[0] : null;
   }
 
   /**

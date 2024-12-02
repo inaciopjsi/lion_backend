@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { PassportModule } from '@nestjs/passport';
 
 import { AppService } from 'src/app.service';
 
@@ -51,6 +52,7 @@ import { JwtAuthStrategy } from 'src/middlewares/jwt-auth.strategy';
         limit: constantsConfig.NUMBER_RATE_LIMIT,
       },
     ]),
+    PassportModule.register({ session: true }),
     CoreConnectionsModule,
     FootballConnectionsModule,
     MpConnectionsModule,
