@@ -1,6 +1,6 @@
-import { Schema } from 'mongoose';
+import * as mongoose from 'mongoose';
 
-export const OrderSchema: Schema = new Schema(
+export const OrderSchema: mongoose.Schema = new mongoose.Schema(
   {
     additional_info: {
       ip_address: String,
@@ -35,7 +35,7 @@ export const OrderSchema: Schema = new Schema(
       payer: {
         type: String,
         id: String,
-        operator_id: Schema.Types.Mixed,
+        operator_id: mongoose.Schema.Types.Mixed,
         email: String,
         registration_date: String,
         is_prime_user: String,

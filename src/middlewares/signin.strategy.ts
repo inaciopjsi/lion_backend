@@ -19,6 +19,7 @@ export class SignInStrategy extends PassportStrategy(Strategy, 'signin') {
       email: email,
       password: password,
     });
+    console.log('SignInStrategy', user);
     if (!user) {
       throw new UnauthorizedException();
     }

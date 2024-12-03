@@ -1,8 +1,7 @@
-import { Schema, Types } from 'mongoose';
+import * as mongoose from 'mongoose';
 
-export const ItemSchema: Schema = new Schema(
+export const ItemSchema: mongoose.Schema = new mongoose.Schema(
   {
-    id: Types.ObjectId,
     name: String,
     description: String,
     enabled: Boolean,

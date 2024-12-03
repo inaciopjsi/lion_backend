@@ -177,7 +177,18 @@ export class UsersService {
    * @returns {Promise<User>} User changed.
    */
   async getUserByEmail(email: string): Promise<IUser> {
-    return await this.userModel.findOne({ email }).exec();
+    return await this.userModel
+      .findOne({ email })
+      .populate('roles', { _id: true })
+      .select({
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+        enabled: true,
+        label: true,
+        roles: true,
+      });
   }
 
   /**
@@ -325,30 +336,18 @@ export class UsersService {
    * @returns {Promise<IUser>} User data.
    */
   async getAnyUserById(userId: string): Promise<any> {
-    const user = await this.userModel
-      .aggregate()
-      .match({ _id: new mongoose.Types.ObjectId(userId) })
-      .lookup({
-        from: 'roles',
-        localField: 'roles',
-        foreignField: '_id',
-        as: 'roles',
-      })
-      .project({
+    return await this.userModel
+      .findById({ _id: userId })
+      .populate('roles', { _id: true, name: true })
+      .select({
         id: true,
         name: true,
         email: true,
         avatar: true,
         label: true,
         refreshToken: true,
-        roles: {
-          _id: true,
-          name: true,
-        },
-      })
-      .limit(1);
-
-    return user.length > 0 ? user[0] : null;
+        roles: true,
+      });
   }
 
   /**

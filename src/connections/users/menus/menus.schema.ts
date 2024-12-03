@@ -1,12 +1,12 @@
-import { Schema, Types } from 'mongoose';
+import * as mongoose from 'mongoose';
 
-export const MenuSchema: Schema = new Schema(
+export const MenuSchema: mongoose.Schema = new mongoose.Schema(
   {
     name: String,
     label: String,
     root: Boolean,
     description: String,
-    parentId: Types.ObjectId,
+    parentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Menu' },
     iconImg: String,
     routerLink: String,
     internal: Boolean,
@@ -16,7 +16,7 @@ export const MenuSchema: Schema = new Schema(
     enabled: Boolean,
     permanent: Boolean,
     visible: Boolean,
-    roles: [Types.ObjectId],
+    roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
     createdAt: Date,
     updatedAt: Date,
   },

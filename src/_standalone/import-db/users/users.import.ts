@@ -33,7 +33,7 @@ export class UsersImport {
           const newUser = user as CreateAdminUserDto;
           !!_oldUser
             ? await this.usersService.updateAdminUser(
-                _oldUser.id,
+                _oldUser._id,
                 newUser as UpdateAdminUserDto,
               )
             : await this.usersService.createAdminUser(newUser);

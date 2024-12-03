@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 
 export interface IUser extends Document {
-  id: Types.ObjectId;
+  _id: string;
   name: string;
   username: string;
   nickname: string;

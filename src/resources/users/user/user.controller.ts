@@ -17,6 +17,7 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { HttpResponseHelper } from 'src/helpers/http-response.helper';
 import { UpdateSiteMeDto } from './dto/update-site-user.dto';
 import { MyPasswordChange } from './dto/my-password-change';
+
 /**
  * Controller for session user data
  */
@@ -111,11 +112,12 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('my_self')
   async getMySelf(@Req() request, @Res() response) {
+    console.log('Get my_self', request.user);
     return response
       .status(HttpStatus.OK)
       .json(
         HttpResponseHelper.successResponse(
-          await this.userService.getMySelf(request.user.id),
+          await this.userService.getMySelf(request.user._id),
           '/user/my_self',
           HttpResponseHelper.GET,
         ),

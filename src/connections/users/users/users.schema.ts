@@ -1,9 +1,10 @@
-import { Schema, Types } from 'mongoose';
+import * as mongoose from 'mongoose';
+import { EncryptionHelper } from 'src/helpers/encryption.helper';
 
-const SubscriptionSchema: Schema = new Schema(
+const SubscriptionSchema: mongoose.Schema = new mongoose.Schema(
   {
-    planId: Types.ObjectId,
-    previousSubscribe: Types.ObjectId,
+    planId: { type: mongoose.Schema.Types.ObjectId, ref: 'Plan' },
+    previousSubscribe: mongoose.Types.ObjectId,
     registeredBy: String,
     enabled: Boolean,
     canceled: Boolean,
@@ -26,7 +27,6 @@ const SubscriptionSchema: Schema = new Schema(
         updatedAt: Date,
       },
       {
-        _id: false,
         strict: true,
         strictQuery: false,
       },
@@ -40,7 +40,7 @@ const SubscriptionSchema: Schema = new Schema(
   },
 );
 
-export const UserSchema: Schema = new Schema(
+export const UserSchema: mongoose.Schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -72,7 +72,7 @@ export const UserSchema: Schema = new Schema(
     recoveryToken: String,
     recoveryExpire: Date,
     hash: String,
-    roles: [Types.ObjectId],
+    roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
     socialNetworks: [
       {
         name: String,
@@ -144,3 +144,36 @@ export const UserSchema: Schema = new Schema(
     strictQuery: false,
   },
 );
+
+UserSchema.post(['find', 'findOne'], function (results) {
+  if (Array.isArray(results)) {
+    return mongoose.overwriteMiddlewareResult(
+      results.map((result) => {
+        const r = JSON.parse(JSON.stringify(result));
+        r._id = EncryptionHelper.encryptationText(result._id);
+        return r;
+      }),
+    );
+  } else {
+    const r = JSON.parse(JSON.stringify(results));
+    r._id = EncryptionHelper.encryptationText(results._id);
+    return mongoose.overwriteMiddlewareResult(r);
+  }
+});
+
+UserSchema.pre(['find', 'findOne'], function (next) {
+  try {
+    if (
+      this.getFilter()?._id._id &&
+      this.getFilter()._id._id.indexOf('l') > -1
+    ) {
+      console.log('here');
+      this.setQuery({
+        _id: new mongoose.Types.ObjectId(
+          EncryptionHelper.decipherText(this.getFilter()._id._id),
+        ),
+      });
+    }
+  } catch (e: any) {}
+  next();
+});

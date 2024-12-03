@@ -52,7 +52,7 @@ export class AuthService {
         rolesNames.push(role.name);
       });
 
-      return this._token(user.id, keepLogged, roles);
+      return this._token(user._id, keepLogged, roles);
     });
   }
 
@@ -63,7 +63,7 @@ export class AuthService {
         user.refreshToken,
       )
     ) {
-      return this._token(user.id, user.keepLogged, user.roles);
+      return this._token(user._id, user.keepLogged, user.roles);
     }
     throw new UnauthorizedException();
   }
@@ -73,13 +73,13 @@ export class AuthService {
     if (user) {
       const token = BcryptHelper.UUID();
       const resp = Promise.all([
-        this.usersService.setRecoveryTokenUser(user.id, token),
+        this.usersService.setRecoveryTokenUser(user._id, token),
         //this.systemMailService.sendAuthRecoveryEmail(user, token),
       ]);
       return resp
         .then((arrayResponses) => {
           // if (arrayResponses[0].id && arrayResponses[1].accepted.length > 0) {
-          if (arrayResponses[0].id) {
+          if (arrayResponses[0]._id) {
             return true;
           }
         })
@@ -115,11 +115,8 @@ export class AuthService {
       sitePasswordChange.recoveryCode,
     );
     if (user) {
-      this.usersService.deleteRecoveryTokenUser(user.id.toString());
-      return this.usersService.changeUserPassword(
-        user.id.toString(),
-        sitePasswordChange,
-      );
+      this.usersService.deleteRecoveryTokenUser(user._id);
+      return this.usersService.changeUserPassword(user._id, sitePasswordChange);
     } else {
       throw new InternalServerErrorException();
     }
@@ -179,7 +176,7 @@ export class AuthService {
       roles?.forEach((role) => {
         rolesNames.push(role.name);
       });
-      return this._token(user.id, false, roles);
+      return this._token(user._id, false, roles);
     });
   }
 }

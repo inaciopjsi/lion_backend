@@ -26,4 +26,5 @@ export const constantsConfig = {
   NUMBER_RATE_LIMIT: 100, // limit each IP to NUMBER_RATE_LIMIT requests per TIME_RATE_LIMIT
   CONNECTION_TIMEOUT: '15s',
   CORS_ORIGIN: 'https://localhost:4200',
+  ENCRYPTATION_SECRET: 'd6F3Efeq',
 } as const;

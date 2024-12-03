@@ -1,6 +1,6 @@
-import { Schema } from 'mongoose';
+import * as mongoose from 'mongoose';
 
-export const PermissionSchema: Schema = new Schema(
+export const PermissionSchema: mongoose.Schema = new mongoose.Schema(
   {
     name: String,
     description: String,
