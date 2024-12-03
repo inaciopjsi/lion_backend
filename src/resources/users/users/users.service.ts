@@ -177,18 +177,16 @@ export class UsersService {
    * @returns {Promise<User>} User changed.
    */
   async getUserByEmail(email: string): Promise<IUser> {
-    return await this.userModel
-      .findOne({ email })
-      .populate('roles', { _id: true })
-      .select({
-        id: true,
-        name: true,
-        email: true,
-        password: true,
-        enabled: true,
-        label: true,
-        roles: true,
-      });
+    console.log('getUserByEmail');
+    return await this.userModel.findOne({ email }).select({
+      id: true,
+      name: true,
+      email: true,
+      password: true,
+      enabled: true,
+      label: true,
+      roles: true,
+    });
   }
 
   /**
@@ -337,7 +335,7 @@ export class UsersService {
    */
   async getAnyUserById(userId: string): Promise<any> {
     return await this.userModel
-      .findById({ _id: userId })
+      .findById(userId)
       .populate('roles', { _id: true, name: true })
       .select({
         id: true,
@@ -347,7 +345,8 @@ export class UsersService {
         label: true,
         refreshToken: true,
         roles: true,
-      });
+      })
+      .lean();
   }
 
   /**

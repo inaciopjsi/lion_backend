@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
 import { EncryptionHelper } from 'src/helpers/encryption.helper';
+import { IUser } from './users.interface';
 
 const SubscriptionSchema: mongoose.Schema = new mongoose.Schema(
   {
@@ -145,35 +146,110 @@ export const UserSchema: mongoose.Schema = new mongoose.Schema(
   },
 );
 
-UserSchema.post(['find', 'findOne'], function (results) {
-  if (Array.isArray(results)) {
-    return mongoose.overwriteMiddlewareResult(
-      results.map((result) => {
-        const r = JSON.parse(JSON.stringify(result));
-        r._id = EncryptionHelper.encryptationText(result._id);
-        return r;
-      }),
-    );
-  } else {
-    const r = JSON.parse(JSON.stringify(results));
-    r._id = EncryptionHelper.encryptationText(results._id);
-    return mongoose.overwriteMiddlewareResult(r);
-  }
-});
-
-UserSchema.pre(['find', 'findOne'], function (next) {
-  try {
-    if (
-      this.getFilter()?._id._id &&
-      this.getFilter()._id._id.indexOf('l') > -1
-    ) {
-      console.log('here');
-      this.setQuery({
-        _id: new mongoose.Types.ObjectId(
-          EncryptionHelper.decipherText(this.getFilter()._id._id),
-        ),
-      });
-    }
-  } catch (e: any) {}
+UserSchema.pre('find', function (next) {
+  console.log('UserSchema - pre - find');
   next();
 });
+
+UserSchema.pre('aggregate', function (next) {
+  console.log('UserSchema - pre - aggregate');
+  const match_idx = this.pipeline().findIndex((pipe) => '$match' in pipe);
+  if (match_idx > -1) {
+    const match_obj = this.pipeline()[match_idx]['$match'];
+    this.pipeline().splice(match_idx, 1);
+    match_obj!._id && match_obj!._id.toString().indexOf('l') > -1
+      ? (match_obj._id = new mongoose.Types.ObjectId(
+          EncryptionHelper.decipherText(match_obj._id.toString()),
+        ))
+      : null;
+    this.match(match_obj);
+  }
+  next();
+});
+
+UserSchema.pre('findOne', function (next) {
+  console.log('UserSchema - pre - findOne');
+  console.log(this.getFilter());
+  this.setQuery(changeQueryFindOne(this.getFilter()));
+  next();
+});
+
+UserSchema.post('aggregate', function (results) {
+  console.log('UserSchema - post - aggregate');
+  const ret = results.map((res) => {
+    return changeAggregateObjectUser(res);
+  });
+
+  console.log('post result', ret);
+  return mongoose.overwriteMiddlewareResult(ret);
+});
+
+UserSchema.post('find', function (results) {
+  console.log('UserSchema - post - find');
+  const ret = results.map((res) => {
+    return changeObjectUser(res);
+  });
+  return mongoose.overwriteMiddlewareResult(ret);
+});
+
+UserSchema.post('findOne', function (result) {
+  console.log('UserSchema - post - findOne', result);
+  return mongoose.overwriteMiddlewareResult(changeObjectUser(result));
+});
+
+/**
+ *Altera o Objeto resposta das buscas
+ *
+ * @param {IRole} result
+ * @return {*}
+ */
+function changeObjectUser(result: IUser) {
+  const r = JSON.parse(JSON.stringify(result));
+
+  //Criptografa o _id do Objeto User
+  r._id = EncryptionHelper.encryptationText(result._id.toString());
+
+  //Criptografa o _id dos Objetos Roles para cada elemento do array
+  if (result.roles && Array.isArray(result.roles) && result.roles.length > 0) {
+    r.roles = result.roles.map((role) =>
+      EncryptionHelper.encryptationText(role.toString()),
+    );
+  }
+  return r;
+}
+
+/**
+ *Altera o Objeto resposta das buscas
+ *
+ * @param {IRole} result
+ * @return {*}
+ */
+function changeAggregateObjectUser(result: IUser) {
+  const r = JSON.parse(JSON.stringify(result));
+
+  //Criptografa o _id do Objeto User
+  r._id = EncryptionHelper.encryptationText(result._id.toString());
+
+  //Criptografa o _id dos Objetos Roles para cada elemento do array
+  if (result.roles && Array.isArray(result.roles) && result.roles.length > 0) {
+    r.roles = result.roles.map((role: any) => {
+      role._id = EncryptionHelper.encryptationText(role._id.toString());
+      return role;
+    });
+  }
+  return r;
+}
+
+/**
+ *
+ *
+ * @param {*} query
+ * @return {*}
+ */
+function changeQueryFindOne(query) {
+  //Decifras os Ids para uma busca em um array de valores correspondentes aos Ids
+  if (query._id) {
+    query._id = EncryptionHelper.decipherText(query._id);
+  }
+  return query;
+}

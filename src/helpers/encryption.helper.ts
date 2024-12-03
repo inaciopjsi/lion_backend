@@ -26,7 +26,7 @@ export class EncryptionHelper {
     return `${EncryptionHelper.iv.toString('hex')}l${encryptedData.toString('hex')}`;
   }
 
-  static decipherText(encryptedText) {
+  static decipherText(encryptedText: string) {
     const [ivAsHex, encryptedDataAsHex] = encryptedText.split('l');
     const iv = Buffer.from(ivAsHex, 'hex');
     const decipher = crypto.createDecipheriv(

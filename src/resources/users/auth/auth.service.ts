@@ -115,8 +115,11 @@ export class AuthService {
       sitePasswordChange.recoveryCode,
     );
     if (user) {
-      this.usersService.deleteRecoveryTokenUser(user._id);
-      return this.usersService.changeUserPassword(user._id, sitePasswordChange);
+      this.usersService.deleteRecoveryTokenUser(user._id.toString());
+      return this.usersService.changeUserPassword(
+        user._id.toString(),
+        sitePasswordChange,
+      );
     } else {
       throw new InternalServerErrorException();
     }

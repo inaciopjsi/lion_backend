@@ -1,7 +1,7 @@
-import { Types } from 'mongoose';
+import * as mongoose from 'mongoose';
 
 export interface IUser extends Document {
-  _id: string;
+  _id: string | mongoose.Types.ObjectId;
   name: string;
   username: string;
   nickname: string;
@@ -20,7 +20,7 @@ export interface IUser extends Document {
   recoveryToken: string;
   recoveryExpire: Date;
   hash: string;
-  roles: [Types.ObjectId];
+  roles: [mongoose.Types.ObjectId];
   socialNetworks: [
     {
       name: string;
@@ -73,8 +73,8 @@ export interface IUserBase {
 }
 
 export interface ISubscription extends Document {
-  planId: Types.ObjectId;
-  previousSubscribe: Types.ObjectId;
+  planId: mongoose.Types.ObjectId;
+  previousSubscribe: mongoose.Types.ObjectId;
   registeredBy: string;
   enabled: boolean;
   canceled: boolean;
